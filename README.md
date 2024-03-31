@@ -37,16 +37,18 @@ Install the required dependencies:
 
 Copy the following code into your `server.js` file. This is your starting point, including importing necessary modules and setting up a basic server structure.
 
-import "dotenv/config";  
-import express from "express";  
-import cors from "cors";  
+```js
+import "dotenv/config";
+import express from "express";
+import cors from "cors";
 import { Document, VectorStoreIndex, SimpleDirectoryReader } from "llamaindex";
 
-const app = express();  
-const port = process.env.PORT || 3000;  
-app.use(cors());  
-// Middleware to use JSON body parsing  
+const app = express();
+const port = process.env.PORT || 3000;
+app.use(cors());
+// Middleware to use JSON body parsing
 app.use(express.json());
+```
 
 Remember to create an openAI account.
 
@@ -55,55 +57,65 @@ Remember to create an openAI account.
 - Copy the key
 - Create a file in the main folder of the project called “.env” (note the dot at the beginning of the file name) and insert the text there:
 
-OPENAI_API_KEY=your_key
+`OPENAI_API_KEY=your_key`
 
 Instead of “your_key,” enter the key you copied from OpenAI and save the file. Then add the following code
 
-...  
-const keys = process.env.OPENAI_API_KEY;  
-if (!keys) {  
- throw new Error("No OpenAI API key provided");  
-}  
+```js
 ...
+const keys = process.env.OPENAI_API_KEY;
+if (!keys) {
+ throw new Error("No OpenAI API key provided");
+}
+...
+```
 
 ### Step 4: Initialize the Index
 
 Add the asynchronous function `initializeIndex` to load and index your documents. This assumes you have a directory `./data` with your documents.
 
-async function initializeIndex() {  
- const documents = await new SimpleDirectoryReader().loadData({  
- directoryPath: "./data",  
- });  
- return await VectorStoreIndex.fromDocuments(documents);  
+```js
+async function initializeIndex() {
+  const documents = await new SimpleDirectoryReader().loadData({
+    directoryPath: "./data",
+  });
+  return await VectorStoreIndex.fromDocuments(documents);
 }
+```
 
 ### Step 5: Create a Route to Handle Queries
 
 Extend your `server.js` by adding a POST route that will process the queries.
 
-app.post("/query", async (req, res) => {  
- try {  
- const index = await initializeIndex();  
- const queryEngine = index.asQueryEngine();  
- const query = req.body.query; // Expecting a query in the JSON body  
-if (!query) {  
- return res.status(400).send({ error: "Query not provided" });  
- }  
- const response = await queryEngine.query({ query });  
- res.send({ response: response.toString() });  
- } catch (error) {  
- console.error(error);  
- res.status(500).send({ error: "An error occurred while processing the query." });  
- }  
+```js
+app.post("/query", async (req, res) => {
+  try {
+    const index = await initializeIndex();
+    const queryEngine = index.asQueryEngine();
+    const query = req.body.query; // Expecting a query in the JSON body
+    if (!query) {
+      return res.status(400).send({ error: "Query not provided" });
+    }
+    const response = await queryEngine.query({ query });
+    res.send({ response: response.toString() });
+  } catch (error) {
+    console.error(error);
+    res
+      .status(500)
+      .send({ error: "An error occurred while processing the query." });
+  }
 });
+```
 
 ### Step 6: Start Your Server
 
 Finalize your `server.js` by adding the code to start the Express server.
 
-app.listen(port, () => {  
- console.log(`Server running on port ${port}`);  
+```js
+app.listen(port, () => {
+  console.log(`Server running on port ${port}`);
 });
+```
 
 ### Step 7: Running Your Server
 
@@ -117,12 +129,18 @@ Your server is now running on `http://localhost:3000` (or another port if you’
 
 To test your server, you can use a tool like Postman or a simple `curl` command in the terminal:
 
-curl -X POST http://localhost:3000/query -H "Content-Type: application/json" -d "{\"query\":\"What did the author do in college?\"}"
+`curl -X POST http://localhost:3000/query -H "Content-Type: application/json" -d "{\"query\":\"What did the author do in college?\"}"`
 
 Postman:
 
-URL POST: [http://localhost:3000/query](http://localhost:3000/query). Body: JSON { “query”: “What did the author do in college?” }
+URL POST: `[http://localhost:3000/query](http://localhost:3000/query) `. Body: JSON `{ “query”: “What did the author do in college?” }`
 
 ### Conclusion
 
 You’ve now created a basic server capable of handling text queries against a set of documents, utilizing the Express framework and handling CORS requests. This setup is quite flexible and can be adapted to various applications, such as a search engine or a FAQ bot.
+
+Application:
+
+![](https://cdn-images-1.medium.com/max/1600/1*nT_9s_j0MZOWYxrf5D6TqQ.png)
+
+Here is a simple react web app using this server to answer questions based on the doc in the server.
