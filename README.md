@@ -133,7 +133,7 @@ To test your server, you can use a tool like Postman or a simple `curl` command 
 
 Postman:
 
-URL POST: `[http://localhost:3000/query](http://localhost:3000/query) `. Body: JSON `{ “query”: “What did the author do in college?” }`
+URL POST: `http://localhost:3000/query`. Body: JSON `{ “query”: “What did the author do in college?” }`
 
 ### Conclusion
 
